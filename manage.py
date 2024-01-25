@@ -17,9 +17,6 @@ def main():
         ) from exc
     execute_from_command_line(sys.argv)
 
-from decouple import config
-
-config.read_env()
 
 if __name__ == '__main__':
     main()
