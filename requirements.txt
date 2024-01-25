@@ -9,4 +9,4 @@ qrcode==7.4.2
 sqlparse==0.4.4
 virtualenv==20.24.6
 virtualenvwrapper-win==1.2.7
-
+python-decouple==3.8
