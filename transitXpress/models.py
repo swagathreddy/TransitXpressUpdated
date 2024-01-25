@@ -30,17 +30,22 @@ class Confirmation(models.Model):
     booking_date = models.DateField(null=True, blank=True)
     qr_code = models.ImageField(upload_to='', blank=True, null=True)
 
-    def save(self, *args, **kwargs):
+     def save(self, *args, **kwargs):
         if not self.qr_code:
-            qr_data = f"From: {self.from_location}\nTo: {self.to_location}"
-            qr_code_image = self.generate_qr_code(qr_data)
+            # Generate QR code
+            data = f"From: {self.from_location}\nTo: {self.to_location}"
+            qr = qrcode.QRCode(version=1, box_size=10, border=5)
+            qr.add_data(data)
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white")
 
+            # Convert image to bytes
             buffer = BytesIO()
-            qr_code_image.save(buffer, format='PNG')
+            qr_img.save(buffer, format="PNG")
             image_bytes = buffer.getvalue()
 
-            # Save the QR code image directly to the database field
-            self.qr_code.save(f"{self.id}_qr.png", ContentFile(image_bytes), save=False)
+            # Save QR code directly to the database
+            self.qr_code = image_bytes
 
         super().save(*args, **kwargs)
 
