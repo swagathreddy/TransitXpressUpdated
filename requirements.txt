@@ -1,0 +1,11 @@
+cachetools==5.3.1
+Django==4.2.7
+gitdb==4.0.10
+GitPython==3.1.31
+jsonschema==4.17.3
+psycopg2-binary==2.9.9
+qrcode==7.4.2
+sqlparse==0.4.4
+virtualenv==20.24.6
+virtualenvwrapper-win==1.2.7
+
