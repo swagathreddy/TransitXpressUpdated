@@ -24,23 +24,21 @@ class Confirmation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     from_location = models.CharField(max_length=255, null=True, blank=True)
     to_location = models.CharField(max_length=255, null=True, blank=True)
-    passenger_name = models.CharField(max_length=100)
+    passenger_name = models.CharField(max_length=255)
     email = models.EmailField()
     payment_mode = models.CharField(max_length=20, null=True, blank=True, default=1)
     booking_date = models.DateField(null=True, blank=True)
-    qr_code = models.ImageField(upload_to='qr_codes/', blank=True)
+    qr_code = models.ImageField(upload_to='',null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.qr_code:
             qr_data = f"From: {self.from_location}\nTo: {self.to_location}"
             qr_code_image = self.generate_qr_code(qr_data)
 
+            # Save the QR code image to the qr_code field without saving to the media folder
             buffer = BytesIO()
             qr_code_image.save(buffer, format='PNG')
-            image_bytes = buffer.getvalue()
-
-            # Save the QR code image to the qr_codes directory with a filename based on the instance's ID
-            self.qr_code.save(f"{self.id}_qr.png", ContentFile(image_bytes), save=False)
+            self.qr_code.save(f"{self.id}_qr.png", ContentFile(buffer.getvalue()), save=False)
 
         super().save(*args, **kwargs)
 
@@ -56,6 +54,6 @@ class Confirmation(models.Model):
 
         img = qr.make_image(fill_color="black", back_color="white")
         return img
-
+    
     def __str__(self):
         return f"{self.passenger_name}'s Booking"
