@@ -43,7 +43,7 @@ class Confirmation(models.Model):
         img = qr.make_image(fill_color="black", back_color="white")
         return img
     
-    def save(self, *args, **kwargs):
+    def  save_qr_code_to_database(self):
         if not self.qr_code:
             qr_data = f"From: {self.from_location}\nTo: {self.to_location}"
             qr_code_image = self.generate_qr_code(qr_data)
@@ -57,6 +57,9 @@ class Confirmation(models.Model):
             # Set the image field of the model using the BytesIO object
             self.qr_code.save(f"{self.id}_qr.png", ContentFile(buffer.getvalue()), save=False)
 
+        
+    def save(self, *args, **kwargs):
+        self.save_qr_code_to_database()
         super().save(*args, **kwargs)
     
     def __str__(self):
