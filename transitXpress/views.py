@@ -14,6 +14,8 @@ import qrcode
 import io
 from .models import Feature, Confirmation
 from django.db.models import Q
+from io import BytesIO
+import base64
 
 # Create your views here.
 
@@ -95,7 +97,10 @@ def generate_qr_code(data):
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")
-    return img
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    qr_code_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return qr_code_image_base64
 
 @login_required
 def confirmation(request):
@@ -129,13 +134,6 @@ def confirmation(request):
         qr_code_data = f"Ticket Code: {unique_code}\nFrom: {from_location}\nTo: {to_location}"
         qr_code_image = generate_qr_code(qr_code_data)
 
-        buffer = io.BytesIO()
-        qr_code_image.save(buffer, format='PNG')
-        image_bytes = buffer.getvalue()
-
-        confirmation_obj.qr_code.save(f"{unique_code}.png", ContentFile(image_bytes), save=False)
-        confirmation_obj.save()
-
         msg = EmailMultiAlternatives(
             "Thank you for your Booking",
             f"{passenger_name} your Ticket is successfully booked from {from_location} to {to_location} on {booking_date}. Here is your QR CODE ",
@@ -144,20 +142,21 @@ def confirmation(request):
         )
         msg.attach_alternative(f'<img src="cid:qr_code_image" alt="QR Code">', "text/html")
         msg.mixed_subtype = 'related'
-        msg.attach_file(confirmation_obj.qr_code.path, mimetype='image/png')
+        # Attach the QR code image directly without using confirmation_obj.qr_code.path
+        msg.attach("qr_code_image.png", qr_code_image, "image/png")
         msg.send()
-
+        print(qr_code_image)
         return render(request, 'success.html', {
             'from_location': from_location,
             'to_location': to_location,
             'passenger_name': passenger_name,
             'email': email,
             'booking_date': booking_date,
-            'confirmation_obj': confirmation_obj,
+            'qr_code_image': qr_code_image,
         })
 
     return render(request, 'conformation.html')
-
+   
 def tickets_view(request):
     if request.user.is_authenticated:
         user_tickets = Confirmation.objects.filter(user=request.user)
