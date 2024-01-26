@@ -28,7 +28,7 @@ class Confirmation(models.Model):
     email = models.EmailField()
     payment_mode = models.CharField(max_length=20, null=True, blank=True, default=1)
     booking_date = models.DateField(null=True, blank=True)
-    qr_code = models.ImageField(null=True, blank=True)
+    qr_code = models.ImageField(upload_to='dummy_folder/',null=True, blank=True)
     
     def generate_qr_code(self, data):
         qr = qrcode.QRCode(
