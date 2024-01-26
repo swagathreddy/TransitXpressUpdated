@@ -6,6 +6,7 @@ import qrcode
 import uuid
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 class Feature(models.Model):
     bus_number = models.CharField(max_length=10, default='TS08AA0000')
@@ -55,7 +56,7 @@ class Confirmation(models.Model):
             qr_code_image.save(buffer, format='PNG')
 
             # Set the image field of the model using the BytesIO object
-            self.qr_code.save(f"{self.id}_qr.png", ContentFile(buffer.getvalue()), save=False)
+            self.qr_code.save(f"{self.id}_qr.png", SimpleUploadedFile(f"{self.id}_qr.png", buffer.getvalue()), save=False)
 
         
     def save(self, *args, **kwargs):
