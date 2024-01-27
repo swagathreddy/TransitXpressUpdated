@@ -71,6 +71,11 @@ def DestinationDetails(request):
         from_location = request.GET.get('from_location')
         to_location = request.GET.get('to_location')
         booking_date_str = request.GET.get('bookingdate')
+        
+        if not (from_location and to_location and booking_date_str):
+            messages.error(request, 'Please fill in all the required fields including Date.')
+            return redirect('index')
+        
         booking_date = datetime.strptime(booking_date_str, "%Y-%m-%d").date() if booking_date_str else None
         booking_date_str = str(booking_date)
         request.session['booking_date'] = booking_date_str
@@ -126,10 +131,11 @@ def confirmation(request):
         to_location = request.POST.get('todesti')
         passenger_name = request.POST.get('passenger_name')
         email = request.POST.get('email')
-        payment_mode = request.POST.get('payment_mode')
+        selected_payment_mode = request.GET.get('selected_payment_mode')
         booking_date = request.session.get('booking_date')
+    
 
-        print(passenger_name, email, payment_mode, f'Fromdesti: {from_location}, Todesti: {to_location}')
+        print(passenger_name, email, selected_payment_mode, f'Fromdesti: {from_location}, Todesti: {to_location}')
         unique_code = f"{request.user}_{from_location}_{to_location}"
         confirmation_obj = Confirmation.objects.create(
             user=request.user,
@@ -137,7 +143,7 @@ def confirmation(request):
             to_location=to_location,
             passenger_name=passenger_name,
             email=email,
-            payment_mode=payment_mode,
+            payment_mode=selected_payment_mode,
             booking_date=booking_date,
         )
         send_mail("Thank you for your Booking",
