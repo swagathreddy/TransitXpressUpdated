@@ -13,7 +13,7 @@
 {% block content %}
 <div class="confirmation-container">
     <h2>Book Now</h2>
-    <form action="{% url 'confirmation' %}" method="post">
+    <form id="confirmation-form" action="{% url 'confirmation' %}" method="post" onsubmit="return validateForm()">
         {% csrf_token %}
         <input type="hidden" name="fromdesti" value="{{ fromdesti }}">
         <input type="hidden" name="todesti" value="{{ todesti }}">
@@ -45,10 +45,32 @@
         </div>
     </form>
 </div>
+
 </body>
 <footer class="footer">
     &copy; 2024  TransitXpress . Built with Django and PostgreSQL
 </footer>
+<!-- userconfirmation.html -->
+<script>
+    function validateForm() {
+        // Get all checkboxes with name "payment_mode[]"
+        var checkboxes = document.querySelectorAll('input[name="payment_mode[]"]');
+        var checkedCheckbox = Array.from(checkboxes).find(checkbox => checkbox.checked);
+
+        if (!checkedCheckbox) {
+            alert("Please select at least one payment option.");
+            return false;
+        }
+
+        // Get the value of the selected checkbox and add it to the URL
+        var selectedPaymentMode = checkedCheckbox.value;
+        var confirmationForm = document.getElementById("confirmation-form");
+        confirmationForm.action += `?selected_payment_mode=${selectedPaymentMode}`;
+
+        return true;  // Proceed with the default form submission
+    }
+</script>
+
 </html>
 <style>
     body {
