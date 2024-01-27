@@ -16,7 +16,7 @@ from .models import Feature, Confirmation
 from django.db.models import Q
 from io import BytesIO
 import base64
-
+from django.utils.html import format_html
 # Create your views here.
 
 def index(request):
@@ -99,6 +99,22 @@ def generate_qr_code(data):
     img = qr.make_image(fill_color="black", back_color="white")
     buffer = BytesIO()
     img.save(buffer, format="PNG")
+    qr_code_image_base64 = buffer.getvalue()
+    return qr_code_image_base64
+
+def generate_qr_code1(data):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
     qr_code_image_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
     return qr_code_image_base64
 
@@ -131,9 +147,13 @@ def confirmation(request):
                   fail_silently=True,
                   html_message=f'<p>{passenger_name}, your Ticket is successfully booked from {from_location} to {to_location} on {booking_date}. Here is your QR CODE:</p><br><img src="cid:qr_code_image" alt="QR Code">'
                   )
-        qr_code_data = f"Ticket Code: {unique_code}\nFrom: {from_location}\nTo: {to_location}"
-        qr_code_image = generate_qr_code(qr_code_data)
+        qr_code_data_mail = f"Ticket Code: {unique_code}\nFrom: {from_location}\nTo: {to_location}"
+        qr_code_data_successhtml = f"Ticket Code: {unique_code}\nFrom: {from_location}\nTo: {to_location}"
+        qr_code_image_mail_send = generate_qr_code(qr_code_data_mail)
+        qr_code_image_success_html=generate_qr_code1(qr_code_data_successhtml)
+        
 
+        
         msg = EmailMultiAlternatives(
             "Thank you for your Booking",
             f"{passenger_name} your Ticket is successfully booked from {from_location} to {to_location} on {booking_date}. Here is your QR CODE ",
@@ -142,17 +162,17 @@ def confirmation(request):
         )
         msg.attach_alternative(f'<img src="cid:qr_code_image" alt="QR Code">', "text/html")
         msg.mixed_subtype = 'related'
-        # Attach the QR code image directly without using confirmation_obj.qr_code.path
-        msg.attach("qr_code_image.png", qr_code_image, "image/png")
+# Attach the QR code image directly without using confirmation_obj.qr_code.path
+        msg.attach("qr_code_image.png", qr_code_image_mail_send, "image/png")
         msg.send()
-        print(qr_code_image)
+        print(qr_code_image_mail_send)
         return render(request, 'success.html', {
             'from_location': from_location,
             'to_location': to_location,
             'passenger_name': passenger_name,
             'email': email,
             'booking_date': booking_date,
-            'qr_code_image': qr_code_image,
+            'qr_code_image': qr_code_image_success_html,
         })
 
     return render(request, 'conformation.html')
@@ -170,6 +190,5 @@ def routes(request):
     return render(request, 'routes.html',{'features':features})
 def parcel_delivery(request):
     return render(request,'parcel_delivery.html')
-
 
 
