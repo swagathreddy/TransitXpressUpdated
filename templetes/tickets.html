@@ -1,3 +1,5 @@
+{% load custom_filters %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -125,7 +127,10 @@
                             </div>
                             <div class="payment-mode">
                                 
-                                <img class="qr-code" src="{{ ticket.qr_code.url }}" alt="QR Code">
+                                {% if ticket.qr_code_image %}
+                                    <!-- Convert binary data to base64 and use it in the src attribute -->
+                                    <img class="qr-code" src="data:image/png;base64,{{ ticket.qr_code_image|base64_encode }}" alt="QR Code">
+                                {% endif %}
                             </div>
                             
                         </div>
