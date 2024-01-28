@@ -23,7 +23,7 @@
     <div class="bus">
         <div class="bus-image" onclick="showPlaceDetails('{{ route.place_notes }}')">
             <!-- Move the opening <p> tag inside the div with the onclick function -->
-            <p>Know more about {{route.todesti}}, Tap on the image below</p>
+            <p>To know more about {{route.todesti}}, Tap on the image below</p>
             {% if route.bus_image  and route.bus_image.url %}
                 <img src="{{ route.bus_image.url }}" alt="Bus Image">
             {% else %}
@@ -33,8 +33,9 @@
         </div>
         <!-- Move the closing </div> tag inside the div with the onclick function -->
         <div class="bus-details">
-            <h3 class="bus_name">Bus Name:{{ route.bus_name }}</h3>
+            
             <div class="route_details">{{ route.fromdesti }} - {{ route.todesti }}</div>
+            <h5 class="bus_name">Bus Name:{{ route.bus_name }}</h5>
             <p class="bus_number"><span class="label">Bus Number:</span> {{ route.bus_number }}</p>
             <p class="Ticket_fare"><span class="label">Ticket Fare:</span>{{ route.ticket_fare }}rs</p>
             <p class="arrival_time"><span class="label">Arrival Time:</span>{{ route.arrival_time}}</p>
@@ -254,7 +255,8 @@
             align-items: flex-start;
         }
         .route_details{
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            margin-right: 10%;
         }
         .bus-details {
             margin-left: 10%;
@@ -267,16 +269,22 @@
             height: auto;
         }
         .bus_number {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             max-width: 350px;
+            margin-right: 10%;
             
         }
         .Ticket_fare{
-            margin-left: 5%;
+            font-size: 1.2rem;
+            margin-right: 15%;
             
         }
-        h4{
-            padding: 0;
+        .bus_name{
+            margin-right: 10%;
+        }
+        .arrival_time{
+            font-size: 1.2rem;
+            margin-right: 10%;
         }
     }
 </style>
