@@ -81,9 +81,11 @@ def DestinationDetails(request):
         request.session['booking_date'] = booking_date_str
         print(from_location, to_location, booking_date)
         routes = Feature.objects.filter(Q(fromdesti__icontains=from_location) | Q(todesti__icontains=to_location))
-        return render(request, 'Destinationdetails.html', {'routes': routes})
-    messages.info(request, "No routes found. Please search for other places.")
-    return render(request, 'Destinationdetails.html', {'routes': []})
+        if routes:
+            return render(request, 'Destinationdetails.html', {'routes': routes})
+        else:
+            messages.info(request, "No routes found. Please search for other places.")
+            return render(request, 'Destinationdetails.html')
 
 @login_required
 def user_confirmation(request, route_id):
