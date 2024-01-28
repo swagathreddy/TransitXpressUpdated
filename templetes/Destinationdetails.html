@@ -1,6 +1,7 @@
-{% load static %}
+{% load static%}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,82 +12,87 @@
     <!-- Include the CSS and other head content from index.html -->
     {% include 'index_head.html' %}
 </head>
+
 <body>
-    
+
     {% include 'index_header.html' %}
 
+    {% block content %}
+    <div class="bus-container">
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    </div>
 
-{% block content %}
-<div class="bus-container">
-    {% if routes %}
-    {% for route in routes %}
-    <div class="bus">
-        <div class="bus-image" onclick="showPlaceDetails('{{ route.place_notes }}')">
-            <!-- Move the opening <p> tag inside the div with the onclick function -->
-            <p>To know more about {{route.todesti}}, Tap on the image below</p>
-            {% if route.bus_image  and route.bus_image.url %}
+    <div class="bus-container">
+        {% if routes %}
+        {% for route in routes %}
+        <div class="bus">
+            <div class="bus-image" onclick="showPlaceDetails('{{ route.place_notes }}')">
+                <!-- Move the opening <p> tag inside the div with the onclick function -->
+                <p>To know more about {{route.todesti}}, Tap on the image below</p>
+                {% if route.bus_image  and route.bus_image.url %}
                 <img src="{{ route.bus_image.url }}" alt="Bus Image">
-            {% else %}
+                {% else %}
                 <!-- Default image or placeholder -->
                 <img src="{% static 'default_bus_image.jpg' %}" alt="Default Bus Image">
-            {% endif %}
-        </div>
-        <!-- Move the closing </div> tag inside the div with the onclick function -->
-        <div class="bus-details">
-            
-            <div class="route_details">{{ route.fromdesti }} - {{ route.todesti }}</div>
-            <h5 class="bus_name">Bus Name:{{ route.bus_name }}</h5>
-            <p class="bus_number"><span class="label">Bus Number:</span> {{ route.bus_number }}</p>
-            <p class="Ticket_fare"><span class="label">Ticket Fare:</span>{{ route.ticket_fare }}rs</p>
-            <p class="arrival_time"><span class="label">Arrival Time:</span>{{ route.arrival_time}}</p>
-            {% if user.is_authenticated %}
+                {% endif %}
+            </div>
+            <!-- Move the closing </div> tag inside the div with the onclick function -->
+            <div class="bus-details">
+
+                <div class="route_details">{{ route.fromdesti }} - {{ route.todesti }}</div>
+                <h5 class="bus_name">Bus Name:{{ route.bus_name }}</h5>
+                <p class="bus_number"><span class="label">Bus Number:</span> {{ route.bus_number }}</p>
+                <p class="Ticket_fare"><span class="label">Ticket Fare:</span>{{ route.ticket_fare }}rs</p>
+                <p class="arrival_time"><span class="label">Arrival Time:</span>{{ route.arrival_time}}</p>
+                {% if user.is_authenticated %}
                 <a href="{% url 'user_confirmation' route.id %}" class="book-now-button">Book Now</a>
-            {% else %}
+                {% else %}
                 <a href="{% url 'login' %}" class="login-link">Login/register to Book</a>
-            {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+    </div>
+    <div id="placeModal" class="modal">
+        <div id="placeModalContent" class="modal-content">
+            <span class="close" onclick="closePlaceDetails()">&times;</span>
         </div>
     </div>
-{% endfor %}
-    {% else %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-    
-</div>
-<div id="placeModal" class="modal">
-    <div id="placeModalContent" class="modal-content">
-        <span class="close" onclick="closePlaceDetails()">&times;</span>
-    </div>
-</div>
+  
+
 </body>
 <footer class="footer">
-    &copy; 2024  TransitXpress . Built with Django and PostgreSQL
+    &copy; 2024 TransitXpress . Built with Django and PostgreSQL
 </footer>
+
 </html>
 <script>
     function showPlaceDetails(placeNotes, imageUrl) {
         var modal = document.getElementById('placeModal');
         var modalContent = document.getElementById('placeModalContent');
-    
+
         // Set the content of the modal
         modalContent.innerHTML = `
             <span class="close" onclick="closePlaceDetails()">&times;</span>
             
             <p>${placeNotes}</p>
         `;
-    
+
         // Display the modal
         modal.style.display = 'block';
     }
-    
+
     function closePlaceDetails() {
         var modal = document.getElementById('placeModal');
-    
+
         // Close the modal
         modal.style.display = 'none';
     }
-    
+
     window.onclick = function (event) {
         var modal = document.getElementById('placeModal');
         if (event.target == modal) {
@@ -94,20 +100,33 @@
             modal.style.display = 'none';
         }
     };
-    
-
 </script>
 <style>
+    /* Add your existing styles here */
+
     body {
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-image: url(/static/image/hyderabad.jpg) ;
+        background-image: url(/static/image/hyderabad.jpg);
         background-repeat: no-repeat;
         background-attachment: fixed;
         background-size: 1300px 550px;
         background-color: rgba(198, 178, 178, 0.8);
     }
+
+ 
+
+    .message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        margin-top: 100px;
+    }
+
     .bus-container {
         background-color: rgba(38, 22, 22, 0.5);
         max-width: 800px;
@@ -236,7 +255,6 @@
     cursor: pointer;
 }
 .footer{
-    margin-top: 10px;
     text-align: center;
     margin-bottom: 20px;
 }
@@ -291,3 +309,4 @@
 
 
 {% endblock %}
+
