@@ -190,6 +190,10 @@ def tickets_view(request):
         user_tickets = Confirmation.objects.filter(user=request.user)
         if user_tickets:
             return render(request, 'tickets.html', {'user_tickets': user_tickets, 'user': request.user})
+        else:
+            return render(request, 'tickets.html', {'user_tickets': None, 'user': request.user, 'message': 'No Tickets found'})
+    else:
+        return HttpResponse("<h1>Please <a href='{% url 'login' %}'>login/register</a> to view your tickets.</h1>")
 
 
         
